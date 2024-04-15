@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gpay</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="gpay.png" type="image/x-icon">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div id="form1">
+        <img src="gpay.png" alt="">
+        <h4>Google Pay Fake Receipt Generator</h4>
+        <p>If You have receiver QR , choose it</p>
+        <input type="file" accept="image/*" id="fileInput">
+        <canvas id="canvas" style="display: none;"></canvas>
+        <div id="result"></div>
+      
+        <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+        <script>
+          const fileInput = document.getElementById('fileInput');
+          const resultDiv = document.getElementById('result');
+          const canvas = document.getElementById('canvas');
+          const ctx = canvas.getContext('2d');
+      
+          fileInput.addEventListener('change', handleFileSelect, false);
+      
+          function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+      
+            reader.onload = function (event) {
+              const image = new Image();
+              image.onload = function () {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                ctx.drawImage(image, 0, 0);
+      
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+      
+                if (qrCode && qrCode.data.substr(0,3)==="upi") {
+                 
+                  var queryString=qrCode.data;
+                    const upiIdMatch = queryString.match(/pa=([^&]+)/);
+                    const upiId = upiIdMatch ? upiIdMatch[1] : null;
+                    console.log('UPI ID:', upiId);
+
+                    // Extract UPI Name
+                    const upiNameMatch = queryString.match(/pn=([^&]+)/);
+                    const upiName = upiNameMatch ? decodeURIComponent(upiNameMatch[1]) : null;
+                    console.log('UPI Name:', upiName);
+
+                    document.getElementById("receiver-name-ip").value=upiName;
+                    document.getElementById("receiver-upi-ip").value=upiId;
+
+                
+                } else {
+                  resultDiv.innerText = 'No QR code found.Type Manually';
+                }
+              };
+      
+              image.src = event.target.result;
+            };
+      
+            reader.readAsDataURL(file);
+          }
+        </script>
+
+
+        <input type="text" name="name" id="sender-name" placeholder="Enter Sender Name">
+        <input type="text" name="upi" id="sender-upi-ip" placeholder="Enter Sender UPI ID">
+        <input type="text" name="name" id="receiver-name-ip"  placeholder="Enter Receiver Name">
+        <input type="text" name="upi" id="receiver-upi-ip" placeholder="Enter Receiver UPI ID">
+        <input type="number" name="money" id="money"  placeholder="Enter Amount">
+        <input type="datetime-local" name="date" id="date_ip" >
+        <label for="banks">Choose a your Bank</label>
+
+        <select id="banks" style="width: 200px;height: 40px;border-radius: 10px;">
+            <option value="sbi" style="width: 200px;height: 40px;border-radius: 10px;">State Bank of India</option>
+            <option value="kvb">Karur Vysya Bank</option>
+            <option value="canara">Canara Bank</option>
+            <option value="indian">Indian Bank</option>
+            <option value="hdfc">HDFC</option>
+        </select>
+        <button onclick="update()">Generate</button>
+
+        
+
+    </div>
+    <div id="container" >
+        <div id="logo">
+            <h1  id="logo_ip"></h1>
+        </div>
+        <div id="name" style=" height: 10px; ;">
+            <h2 id="receiver_name"> </h2>
+
+        </div>
+        <div id="amount" >
+            <p  id="amount_ip"> </p>
+
+        </div>
+        <div id="opt">
+            <button style="background-color: rgba(0, 0, 255, 0.614);color: white;">Pay again</button>
+            <button style="width: 150px;background-color: transparent;color: rgba(31, 31, 207, 0.986);">Split with friends</button>
+
+        </div>
+        <div style="margin-bottom: -20px;">
+            
+            <p> <span><img src="check.png" alt="" id="check"></span> Completed</p> 
+        </div>
+        <hr>
+        <p id="date" ></p>
+
+        <div id="bank-details">
+            <div id="bank-name">
+                <div id="bank-logo">
+                    <img src="" id="bank-pic" >
+
+                </div>
+                <div>
+                    <p id="bank-peru" ></p>
+
+                </div>
+                
+            </div>
+            <div id="trans-id">
+                <div style="padding-left: 10px;">
+                    <h5>UPI transaction ID</h5>
+                    <h5 id="upi-trans-id" class="op"></h5>
+                    <br>
+                    
+                    <h5>To: <span id="receiver-n"></span></h5>
+                    <h5 id="receiver-upi" class="op"></h5>
+                    <br>
+                    
+                    <h5>From: <span id="sender-n"></span></h5>
+                    <h5 id="sender-upi" class="op"></h5>
+                    <br>
+                    
+                    <h5>Google transaction ID</h5>
+                    <h5 id="gid" class="op"></h5>
+                </div>
+
+            </div>
+
+        </div>
+        <div id="ending">
+
+        </div>
+        <br><br>
+
+        <button onclick="back()">Back</button>
+        
+       
+
+
+    </div>
+
+    
+
+    <script src="script.js"></script>
+    
+</body>
+</html>
